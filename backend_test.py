@@ -227,15 +227,12 @@ class TrafficWatchAPITester:
             "speed_limit": 60
         }
         
-        # Using query parameters as per the backend implementation
-        params = "&".join([f"{k}={v}" for k, v in calibration_data.items() if k != 'pixel_points'])
-        params += "&pixel_points=[[100,100],[500,100]]"
-        
         success, response = self.run_test(
             "Create Calibration",
             "POST",
-            f"calibration?{params}",
+            "calibration",
             200,
+            data=calibration_data,
             cookies=cookies
         )
         
