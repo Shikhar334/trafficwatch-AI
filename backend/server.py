@@ -502,10 +502,10 @@ async def create_calibration(
     
     calibration = CalibrationZone(
         user_id=user.id,
-        name=name,
-        reference_distance=reference_distance,
-        pixel_points=pixel_points,
-        speed_limit=speed_limit
+        name=request.name,
+        reference_distance=request.reference_distance,
+        pixel_points=request.pixel_points,
+        speed_limit=request.speed_limit
     )
     
     calib_dict = calibration.model_dump()
