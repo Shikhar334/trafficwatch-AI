@@ -326,7 +326,7 @@ async def process_video_background(video_id: str, user_id: str):
                 
                 for box, track_id, cls, conf in zip(boxes, track_ids, classes, confidences):
                     x1, y1, x2, y2 = box
-                    class_name = CLASS_NAMES[cls]
+                    class_name = CLASS_NAMES.get(int(cls), 'unknown')
                     
                     # Calculate center
                     center_x = (x1 + x2) / 2
