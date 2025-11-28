@@ -485,12 +485,15 @@ async def get_violations(video_id: Optional[str] = None, session_token: Optional
     violations = await db.violations.find(query, {"_id": 0}).sort("created_at", -1).to_list(1000)
     return violations
 
+class CalibrationRequest(BaseModel):
+    name: str
+    reference_distance: float
+    pixel_points: List[List[float]]
+    speed_limit: float
+
 @api_router.post("/calibration")
 async def create_calibration(
-    name: str,
-    reference_distance: float,
-    pixel_points: List[List[float]],
-    speed_limit: float,
+    request: CalibrationRequest,
     session_token: Optional[str] = Cookie(None)
 ):
     user = await get_current_user(session_token)
