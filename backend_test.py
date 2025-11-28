@@ -345,7 +345,7 @@ def main():
             },
             'detailed_results': tester.test_results,
             'timestamp': datetime.now().isoformat()
-        }, indent=2)
+        }, f, indent=2)
     
     return 0 if success else 1
 
