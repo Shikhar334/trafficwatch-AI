@@ -44,8 +44,17 @@ PROCESSED_DIR = ROOT_DIR / "processed"
 UPLOADS_DIR.mkdir(exist_ok=True)
 PROCESSED_DIR.mkdir(exist_ok=True)
 
-# Class names from YOLOv8 model
-CLASS_NAMES = ['bike', 'bus', 'car', 'motor', 'person', 'rider', 'truck']
+# Extract clean class names from model (handle metadata in names)
+MODEL_CLASS_NAMES = model.names
+CLASS_NAMES = {}
+for idx, name in MODEL_CLASS_NAMES.items():
+    if idx < 7:  # Only first 7 are actual vehicle classes
+        clean_name = name.split('-')[2].strip() if '-' in name else name
+        CLASS_NAMES[idx] = clean_name
+    else:
+        break
+
+logger.info(f"Loaded YOLOv8 model with classes: {CLASS_NAMES}")
 
 # Tracking data
 tracker_data = defaultdict(lambda: {'positions': deque(maxlen=30), 'speeds': deque(maxlen=10), 'class': None})
