@@ -48,9 +48,8 @@ const CalibrationPanel = ({ onCalibrate }) => {
     try {
       await axios.post(
         `${API}/calibration`,
-        null,
+        formData,
         {
-          params: formData,
           withCredentials: true
         }
       );
