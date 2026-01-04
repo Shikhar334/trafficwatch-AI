@@ -35,7 +35,8 @@ const LandingPage = () => {
             Real-Time Traffic Violation Detection
           </h1>
           <p className="text-lg sm:text-xl text-slate-300 max-w-3xl mx-auto mb-10">
-            Powered by YOLOv8 AI to detect no-helmet violations, wrong-way driving, and overspeeding in real-time video feeds.
+            <em className="italic">“Every frame we analyze is a chance to save a life.”</em>
+            <span className="block mt-3">We don’t detect violations to punish people — we do it to protect them.</span>
           </p>
           <Button 
             data-testid="get-started-button"

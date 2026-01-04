@@ -246,6 +246,46 @@ class TrafficWatchAPITester:
                 cookies=cookies
             )
 
+            # Create a second calibration and ensure GET returns the latest (should pick most recent by created_at)
+            calibration_data2 = {
+                "name": "Test Zone 2",
+                "reference_distance": 3.0,
+                "pixel_points": [[200, 120], [520, 120]],
+                "speed_limit": 50
+            }
+            success, response = self.run_test(
+                "Create Calibration - Second",
+                "POST",
+                "calibration",
+                200,
+                data=calibration_data2,
+                cookies=cookies
+            )
+
+            # Verify GET returns the recently created calibration
+            success_get, response_get = self.run_test(
+                "Get Calibration - After Second Creation",
+                "GET",
+                "calibration",
+                200,
+                cookies=cookies
+            )
+            if success_get:
+                expected = 3.0
+                actual = response_get.get("reference_distance")
+                if actual == expected:
+                    self.log_test("Calibration latest returned correct distance", True)
+                else:
+                    self.log_test("Calibration latest returned correct distance", False, f"Expected {expected}, got {actual}")
+
+                # Also verify speed_limit is returned correctly
+                expected_speed = 50
+                actual_speed = response_get.get("speed_limit")
+                if actual_speed == expected_speed:
+                    self.log_test("Calibration latest returned correct speed_limit", True)
+                else:
+                    self.log_test("Calibration latest returned correct speed_limit", False, f"Expected {expected_speed}, got {actual_speed}")
+
     def test_stats_endpoint(self):
         """Test stats endpoint"""
         print("\n📊 Testing Stats Endpoint...")

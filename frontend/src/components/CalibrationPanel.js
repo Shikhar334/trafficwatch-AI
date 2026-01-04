@@ -14,9 +14,9 @@ const CalibrationPanel = ({ onCalibrate }) => {
   const [calibration, setCalibration] = useState(null);
   const [formData, setFormData] = useState({
     name: 'Default Zone',
-    reference_distance: 5,
+    reference_distance: '',
     pixel_points: [[100, 100], [500, 100]],
-    speed_limit: 60
+    speed_limit: ''
   });
   const [loading, setLoading] = useState(false);
 
@@ -28,6 +28,7 @@ const CalibrationPanel = ({ onCalibrate }) => {
     try {
       const response = await axios.get(`${API}/calibration`, { withCredentials: true });
       if (response.data) {
+        console.debug('Loaded calibration from server:', response.data);
         setCalibration(response.data);
         setFormData({
           name: response.data.name,
@@ -43,10 +44,21 @@ const CalibrationPanel = ({ onCalibrate }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Client-side validation: ensure user entered positive numeric values
+    if (!formData.reference_distance || Number(formData.reference_distance) <= 0) {
+      toast.error('Please enter a positive reference distance (meters).');
+      return;
+    }
+    if (!formData.speed_limit || Number(formData.speed_limit) <= 0) {
+      toast.error('Please enter a positive speed limit (km/h).');
+      return;
+    }
+
     setLoading(true);
     
     try {
-      await axios.post(
+      console.debug('Submitting calibration to server:', formData);
+      const response = await axios.post(
         `${API}/calibration`,
         formData,
         {
@@ -54,9 +66,30 @@ const CalibrationPanel = ({ onCalibrate }) => {
         }
       );
       
+      // Use server-returned record (guaranteed canonical persisted values)
+      const saved = response && response.data ? response.data : null;
+      console.debug('Calibration POST response:', saved);
+      if (saved) {
+        setCalibration(saved);
+        setFormData({
+          name: saved.name || formData.name,
+          reference_distance: saved.reference_distance,
+          pixel_points: saved.pixel_points || formData.pixel_points,
+          speed_limit: saved.speed_limit
+        });
+      }
+
       toast.success('Calibration saved successfully!');
-      loadCalibration();
-      onCalibrate();
+      // Show an explicit applied toast so user sees values applied
+      if (saved) {
+        toast.success(`Calibration applied: ${saved.reference_distance}m, ${saved.speed_limit}km/h`);
+      }
+      // Keep compatibility: refresh server-side value and await it to avoid race conditions
+      try { await loadCalibration(); } catch (e) { console.debug('loadCalibration failed:', e); }
+
+      if (onCalibrate) {
+        try { onCalibrate(); } catch (e) { console.error('onCalibrate callback failed:', e); }
+      }
     } catch (error) {
       toast.error('Failed to save calibration');
     } finally {
@@ -73,7 +106,7 @@ const CalibrationPanel = ({ onCalibrate }) => {
           <Info className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
           <div className="text-sm text-slate-300">
             <p className="font-medium text-white mb-1">Calibration Setup</p>
-            <p>Set a reference distance (in meters) to calibrate speed detection. The default configuration uses a 5-meter reference.</p>
+            <p>Enter calibration values explicitly — reference distance (meters), pixel points, and the speed limit. These values will be applied exactly as entered by the user.</p>
           </div>
         </div>
       </div>
@@ -97,7 +130,7 @@ const CalibrationPanel = ({ onCalibrate }) => {
             type="number"
             step="0.1"
             value={formData.reference_distance}
-            onChange={(e) => setFormData({ ...formData, reference_distance: parseFloat(e.target.value) })}
+            onChange={(e) => setFormData({ ...formData, reference_distance: e.target.value === '' ? '' : parseFloat(e.target.value) })}
             className="bg-slate-800 border-slate-700 text-white mt-1"
             required
           />
@@ -110,7 +143,7 @@ const CalibrationPanel = ({ onCalibrate }) => {
             data-testid="speed-limit-input"
             type="number"
             value={formData.speed_limit}
-            onChange={(e) => setFormData({ ...formData, speed_limit: parseInt(e.target.value) })}
+            onChange={(e) => setFormData({ ...formData, speed_limit: e.target.value === '' ? '' : parseInt(e.target.value) })}
             className="bg-slate-800 border-slate-700 text-white mt-1"
             required
           />
