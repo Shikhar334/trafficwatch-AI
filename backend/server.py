@@ -3022,3 +3022,9 @@ async def clear_videos():
     except Exception as e:
         logger.exception('Failed to clear videos: %s', e)
         raise HTTPException(status_code=500, detail=str(e))
+import os
+import uvicorn
+
+if _name_ == "_main_":
+    port = int(os.environ.get("PORT", 8000))  # Use Render-assigned port
+    uvicorn.run(app, host="0.0.0.0", port=port)  # Listen on all interfaces
