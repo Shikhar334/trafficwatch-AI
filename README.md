@@ -28,7 +28,7 @@ This will start both the backend (port 8000) and frontend (port 3000) servers au
   - Overspeeding (vehicles exceeding speed limits)
 - 📊 **Real-time Analytics**: View statistics and violation reports with detailed breakdowns
 - 🎯 **Calibration System**: Configure speed limits and reference distances for accurate speed calculations
-- 🔐 **User Authentication**: Secure authentication using Google  Emergent Auth
+- 🔐 **User Authentication**: Secure authentication using Google Auth
 - 📱 **Modern UI**: Beautiful, responsive interface built with React and Tailwind CSS
 
 ## Tech Stack
